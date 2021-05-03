@@ -115,17 +115,15 @@ class CelestialBodiesSimulation():
     
             fs = self.calc_fs(ms, xs)
             xs = self.calc_xs(vs, xs, deltaT)
+            fs_next_dt = self.calc_fs(ms, xs)
+
+            for i in range(self.nb_bodies):
+                fs[i][0] = (fs[i][0] + fs_next_dt[i][0]) / 2.0 
+                fs[i][1] = (fs[i][1] + fs_next_dt[i][1]) / 2.0 
+                fs[i][2] = (fs[i][2] + fs_next_dt[i][2]) / 2.0 
+
             vs = self.calc_vs(ms, fs, vs, deltaT)
 
-            #vs_copy = copy.deepcopy(vs)
-            #vs_next_dt = self.calc_vs(ms, fs, vs_copy, deltaT)
-
-            #for i in range(self.nb_bodies):
-            #    vs[i][0] = (vs[i][0] + vs_next_dt[i][0]) / 2.0 
-            #    vs[i][1] = (vs[i][1] + vs_next_dt[i][1]) / 2.0 
-            #    vs[i][2] = (vs[i][2] + vs_next_dt[i][2]) / 2.0 
-
-    
             if iters % output_interval == 0:
                 self.write_trajectories_to_output_file(xs, body_types)
     
