@@ -48,7 +48,7 @@ def time_evolution():
     total_time = 100.0
     nb_max_iters = math.ceil(total_time / deltaT)
 
-    output_interval = int(nb_max_iters / 4000)
+    output_interval = int(1.0 / deltaT)
 
     output_file = os.path.splitext(input_file)[0]+'.out'
     f = open(output_file, 'w')
@@ -81,6 +81,10 @@ def time_evolution():
 
         for i in range(nb_bodies):
 
+            xs[i][0] += vs[i][0] * deltaT
+            xs[i][1] += vs[i][1] * deltaT
+            xs[i][2] += vs[i][2] * deltaT
+
             a_ix = fs[i][0] / ms[i]
             a_iy = fs[i][1] / ms[i]
             a_iz = fs[i][2] / ms[i]
@@ -88,10 +92,6 @@ def time_evolution():
             vs[i][0] += a_ix * deltaT
             vs[i][1] += a_iy * deltaT
             vs[i][2] += a_iz * deltaT
-
-            xs[i][0] += vs[i][0] * deltaT
-            xs[i][1] += vs[i][1] * deltaT
-            xs[i][2] += vs[i][2] * deltaT
 
         if iters % output_interval == 0:
 
