@@ -113,8 +113,8 @@ class CelestialBodiesSimulation():
         for iters in range(nb_max_iters):
     
             fs = self.calc_fs(ms, xs)
-            vs = self.calc_vs(ms, fs, vs, deltaT)
             xs = self.calc_xs(vs, xs, deltaT)
+            vs = self.calc_vs(ms, fs, vs, deltaT)
     
             if iters % output_interval == 0:
                 self.write_trajectories_to_output_file(xs, body_types)
