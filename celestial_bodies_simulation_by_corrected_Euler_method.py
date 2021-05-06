@@ -80,7 +80,7 @@ class CelestialBodiesSimulation():
                 
         return fs
 
-    def calc_vs(self, ms, fs, vs, deltaT):
+    def calc_vs_s(self, ms, fs, vs, vs_s, deltaT):
 
         for i in range(self.nb_bodies):
 
@@ -88,19 +88,19 @@ class CelestialBodiesSimulation():
             a_iy = fs[i][1] / ms[i]
             a_iz = fs[i][2] / ms[i]
 
-            vs[i][0] += a_ix * deltaT
-            vs[i][1] += a_iy * deltaT
-            vs[i][2] += a_iz * deltaT
+            vs_s[i][0] = vs[i][0] + a_ix * deltaT
+            vs_s[i][1] = vs[i][1] + a_iy * deltaT
+            vs_s[i][2] = vs[i][2] + a_iz * deltaT
 
-        return vs
+        return vs_s
 
-    def calc_xs(self, vs, xs, deltaT):
+    def calc_xs(self, vs, vs_s, xs, deltaT):
 
         for i in range(self.nb_bodies):
 
-            xs[i][0] += vs[i][0] * deltaT
-            xs[i][1] += vs[i][1] * deltaT
-            xs[i][2] += vs[i][2] * deltaT
+            xs[i][0] += 0.50*(vs[i][0]+vs_s[i][0]) * deltaT
+            xs[i][1] += 0.50*(vs[i][1]+vs_s[i][1]) * deltaT
+            xs[i][2] += 0.50*(vs[i][2]+vs_s[i][2]) * deltaT
 
         return xs
 
@@ -111,24 +111,14 @@ class CelestialBodiesSimulation():
         nb_max_iters = math.ceil(total_time / deltaT)
         output_interval = int(output_interval / deltaT)
 
+        vs_s = copy.deepcopy(vs)
+
         for iters in range(nb_max_iters):
     
             fs = self.calc_fs(ms, xs)
-            xs = self.calc_xs(vs, xs, deltaT)
-            fs_next_dt = self.calc_fs(ms, xs)
-
-            for i in range(self.nb_bodies):
-                fs[i][0] = (fs[i][0] + fs_next_dt[i][0]) / 2.0 
-                fs[i][1] = (fs[i][1] + fs_next_dt[i][1]) / 2.0 
-                fs[i][2] = (fs[i][2] + fs_next_dt[i][2]) / 2.0 
-
-            vs_copy = copy.deepcopy(vs)
-            vs_next_dt = self.calc_vs(ms, fs, vs_copy, deltaT)
-
-            for i in range(self.nb_bodies):
-                vs[i][0] = (vs[i][0] + vs_next_dt[i][0]) / 2.0 
-                vs[i][1] = (vs[i][1] + vs_next_dt[i][1]) / 2.0 
-                vs[i][2] = (vs[i][2] + vs_next_dt[i][2]) / 2.0 
+            vs_s = self.calc_vs_s(ms, fs, vs, vs_s, deltaT)
+            xs = self.calc_xs(vs, vs_s, xs, deltaT)
+            vs = vs_s
 
             if iters % output_interval == 0:
                 self.write_trajectories_to_output_file(xs, body_types)
