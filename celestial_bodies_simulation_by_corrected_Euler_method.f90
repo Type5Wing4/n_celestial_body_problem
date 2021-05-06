@@ -1,4 +1,4 @@
-program celestial_bodies_simluation_by_Euler_method
+program celestial_bodies_simluation_by_corrected_Euler_method
 
         implicit none
         integer :: io = 0

@@ -11,7 +11,7 @@ class CelestialBodiesSimulation():
         self.G = 0.100
 
         self.input_file = input_file
-        self.output_file = os.path.splitext(input_file)[0]+'.out'
+        self.output_file = os.path.splitext(input_file)[0]+'.xyz'
         self.f = open(self.output_file, 'w')
 
     def read_input_file(self, input_file):
@@ -140,5 +140,5 @@ if __name__ == '__main__':
 
     input_file = sys.argv[1]
     cbs = CelestialBodiesSimulation(input_file)
-    cbs.time_evolution(total_time=150, deltaT=1.00e-3, output_interval=1.0)
+    cbs.time_evolution(total_time=150, deltaT=1.00e-3, output_interval=0.25)
 
