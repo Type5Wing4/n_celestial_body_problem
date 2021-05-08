@@ -17,9 +17,9 @@ program celestial_bodies_simluation_by_Runge_Kutta_4th_order_method
         double precision,allocatable,dimension(:,:) :: kv1, kv2, kv3, kv4
         double precision :: kinetic_energy=0d0, potential_energy=0d0
         double precision,parameter :: dt = 1d-4
-        double precision,parameter :: total_time = 200.0
+        double precision,parameter :: total_time = 50.0
         integer,parameter :: nb_max_steps = int(total_time / dt)
-        integer,parameter :: output_interval = 1.0 / dt
+        integer,parameter :: output_interval = 0.05 / dt
 
         call get_command_argument(1, input_file)
         open(12,file=trim(input_file),status='old')
