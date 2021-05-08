@@ -3,9 +3,11 @@ program celestial_bodies_simluation_by_Runge_Kutta_4th_order_method
         implicit none
         integer :: io = 0
         integer :: i, j, k
+        integer :: steps
         integer :: nb_bodies = 0
         character(len=1),allocatable,dimension(:) :: body_type
         character(len=300) :: input_file = ""
+        character(len=300) :: output_file_out = "", output_file_xyz = ""
         double precision,parameter :: G = 1d-1
         double precision :: rij = 0d0, rij3 = 0d0
         double precision :: fij(3) = 0d0
@@ -15,7 +17,7 @@ program celestial_bodies_simluation_by_Runge_Kutta_4th_order_method
         double precision,allocatable,dimension(:,:) :: kv1, kv2, kv3, kv4
         double precision :: kinetic_energy=0d0, potential_energy=0d0
         double precision,parameter :: dt = 1d-4
-        double precision,parameter :: total_time = 100.0
+        double precision,parameter :: total_time = 200.0
         integer,parameter :: nb_max_steps = int(total_time / dt)
         integer,parameter :: output_interval = 1.0 / dt
 
@@ -51,14 +53,23 @@ program celestial_bodies_simluation_by_Runge_Kutta_4th_order_method
         end do
         close(12)
 
-        do k = 1, nb_max_steps
+        output_file_out = input_file(1:index(trim(input_file), '.in'))//'out'
+        open(13,file=trim(output_file_out),status='replace')
+
+        output_file_xyz = input_file(1:index(trim(input_file), '.in'))//'xyz'
+        open(14,file=trim(output_file_xyz),status='replace')
+
+        do steps = 1, nb_max_steps
          call calc_forces
          call calc_k1_k2_k3_k4
          call calc_next_positions
          call calc_velocities
-!        if (mod(k,output_interval) .eq. 1) call calc_energy
-         if (mod(k,output_interval) .eq. 1) call output
+         if (mod(steps,output_interval) .eq. 1) call calc_energy
+         if (mod(steps,output_interval) .eq. 1) call output
         end do
+
+        close(13)
+        close(14)
 
         deallocate(body_type,m,x,sx,v,sv,f,sf,kx1,kx2,kx3,kx4,kv1,kv2,kv3,kv4)
 
@@ -210,17 +221,24 @@ subroutine calc_energy
          end do
         end do
 
-        write(*,*) kinetic_energy, potential_energy, kinetic_energy+potential_energy 
+        write(13,'(A, i0)') 'Steps : ', steps
+        write(13,'(A)') 'Positions and Velocities : '
+        do i = 1, nb_bodies
+        write(13,'(A,6f14.8)') body_type(i), x(i,:), v(i,:)
+        end do
+        write(13,'(3A)') 'E(kinetic)   ', 'E(potential)   ', 'E(total)'
+        write(13,'(6f13.7)') kinetic_energy, potential_energy, kinetic_energy+potential_energy 
+        write(13,*)
 
 end subroutine
 
 subroutine output
 
-        write(*,*) nb_bodies
-        write(*,*)
+        write(14,*) nb_bodies
+        write(14,*)
 
         do i = 1, nb_bodies
-        write(*,*) body_type(i), x(i,:)
+         write(14,'(A,3f13.4)') body_type(i), x(i,:)
         end do
 
 end subroutine
